@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brotien Cafe 🥗</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --acid: #C8FF00;
+    --hot: #FF3D00;
+    --cool: #00FFB2;
+    --dark: #0A0A0A;
+    --mid: #111111;
+    --card: #181818;
+    --border: #2a2a2a;
+    --text: #F5F5F0;
+    --muted: #888;
+    --healthy: #00FFB2;
+    --unhealthy: #FF3D00;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  /* CUSTOM CURSOR */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--acid);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 99999;
+    transition: transform 0.1s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--acid);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 99998;
+    transition: all 0.15s ease;
+    opacity: 0.5;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9997; opacity: 0.4;
+  }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    padding: 2rem;
+  }
+  .hero-bg-text {
+    position: absolute;
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(120px, 20vw, 260px);
+    color: rgba(200,255,0,0.04);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    top: 50%; transform: translateY(-50%);
+    animation: drift 20s ease-in-out infinite alternate;
+    pointer-events: none;
+    user-select: none;
+  }
+  @keyframes drift { from { left: -5%; } to { left: 5%; } }
+  .hero-badge {
+    display: inline-block;
+    background: var(--acid);
+    color: var(--dark);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+    animation: pulse-badge 2s ease-in-out infinite;
+  }
+  @keyframes pulse-badge {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(200,255,0,0.4); }
+    50% { box-shadow: 0 0 0 12px rgba(200,255,0,0); }
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(64px, 12vw, 160px);
+    line-height: 0.9;
+    text-align: center;
+    letter-spacing: -0.01em;
+    z-index: 1;
+  }
+  .hero-title .accent { color: var(--acid); }
+  .hero-sub {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(14px, 2vw, 18px);
+    color: var(--muted);
+    margin: 1.5rem 0 3rem;
+    text-align: center;
+    letter-spacing: 0.05em;
+    z-index: 1;
+  }
+  .hero-scroll {
+    position: absolute; bottom: 2rem;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: var(--muted); font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--acid), transparent);
+  }
+
+  /* FLOATING BLOBS */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  .blob-1 { width: 400px; height: 400px; background: var(--acid); top: -100px; right: -100px; animation: blobmove1 15s ease-in-out infinite alternate; }
+  .blob-2 { width: 300px; height: 300px; background: var(--cool); bottom: -50px; left: -80px; animation: blobmove2 18s ease-in-out infinite alternate; }
+  @keyframes blobmove1 { to { transform: translate(-60px, 80px) scale(1.1); } }
+  @keyframes blobmove2 { to { transform: translate(60px, -60px) scale(0.9); } }
+
+  /* ORDER TYPE SELECTOR */
+  #order-type {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 4rem 2rem;
+    position: relative;
+  }
+  .section-label {
+    font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(40px, 6vw, 80px);
+    line-height: 1;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .big-choice {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.5rem; width: 100%; max-width: 800px;
+    margin-bottom: 2rem;
+  }
+  .choice-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative; overflow: hidden;
+  }
+  .choice-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    opacity: 0; transition: opacity 0.3s;
+    border-radius: inherit;
+  }
+  .choice-card.dine::before { background: radial-gradient(circle at 50% 0%, rgba(200,255,0,0.1), transparent 70%); }
+  .choice-card.delivery::before { background: radial-gradient(circle at 50% 0%, rgba(0,255,178,0.1), transparent 70%); }
+  .choice-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--acid); }
+  .choice-card:hover::before { opacity: 1; }
+  .choice-card.selected { border-color: var(--acid); background: rgba(200,255,0,0.05); }
+  .choice-icon {
+    font-size: 56px; margin-bottom: 1rem;
+    display: block;
+    animation: wiggle 3s ease-in-out infinite;
+  }
+  .choice-card:nth-child(2) .choice-icon { animation-delay: 1.5s; }
+  @keyframes wiggle { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)} }
+  .choice-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 22px;
+    margin-bottom: 0.5rem;
+  }
+  .choice-desc { color: var(--muted); font-size: 14px; }
+
+  .diet-toggle {
+    display: flex;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px;
+    gap: 4px;
+    margin-bottom: 3rem;
+  }
+  .diet-btn {
+    padding: 10px 28px;
+    border-radius: 100px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: none;
+    transition: all 0.25s;
+    letter-spacing: 0.03em;
+  }
+  .diet-btn.active-healthy { background: var(--healthy); color: var(--dark); }
+  .diet-btn.active-unhealthy { background: var(--unhealthy); color: #fff; }
+
+  .cta-btn {
+    background: var(--acid);
+    color: var(--dark);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 18px;
+    padding: 18px 48px;
+    border: none; border-radius: 100px;
+    cursor: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    letter-spacing: 0.02em;
+    position: relative; overflow: hidden;
+  }
+  .cta-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.2);
+    transform: scaleX(0) skewX(-20deg);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+  .cta-btn:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(200,255,0,0.4); }
+  .cta-btn:hover::after { transform: scaleX(1.5) skewX(-20deg); }
+
+  /* MENU */
+  #menu-section {
+    min-height: 100vh; padding: 4rem 2rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .menu-header {
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap;
+    gap: 1rem; margin-bottom: 3rem;
+  }
+  .menu-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(48px, 6vw, 80px);
+  }
+  .menu-mode-tag {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 100px; padding: 8px 20px;
+    font-size: 13px; font-weight: 600;
+  }
+  .mode-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .dish-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+    cursor: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+  .dish-card:hover { transform: translateY(-6px); border-color: rgba(200,255,0,0.4); }
+  .dish-emoji-wrap {
+    height: 140px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 72px;
+    position: relative;
+    overflow: hidden;
+  }
+  .dish-emoji-wrap::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 60%, var(--card));
+  }
+  .dish-body { padding: 1.25rem; }
+  .dish-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 17px;
+    margin-bottom: 4px;
+  }
+  .dish-desc { color: var(--muted); font-size: 13px; margin-bottom: 12px; line-height: 1.5; }
+  .dish-footer {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .dish-price {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 26px; letter-spacing: 0.02em;
+  }
+  .dish-price .price-cur { font-size: 16px; }
+  .add-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--acid);
+    background: transparent;
+    color: var(--acid);
+    font-size: 22px; line-height: 1;
+    cursor: none;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .add-btn:hover { background: var(--acid); color: var(--dark); transform: rotate(90deg) scale(1.1); }
+  .dish-tag {
+    position: absolute; top: 12px; right: 12px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px;
+  }
+  .tag-healthy { background: rgba(0,255,178,0.15); color: var(--healthy); border: 1px solid rgba(0,255,178,0.3); }
+  .tag-unhealthy { background: rgba(255,61,0,0.15); color: var(--unhealthy); border: 1px solid rgba(255,61,0,0.3); }
+  .tag-cal { font-size: 11px; color: var(--muted); }
+
+  /* DISH DETAIL MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(8px);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    max-width: 520px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
+  .modal-emoji {
+    height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 80px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-content { padding: 2rem; }
+  .modal-name {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 40px; margin-bottom: 4px;
+  }
+  .modal-desc { color: var(--muted); margin-bottom: 1.5rem; font-size: 15px; line-height: 1.6; }
+  .calories-big {
+    display: flex; align-items: baseline; gap: 6px;
+    background: rgba(200,255,0,0.07);
+    border: 1px solid rgba(200,255,0,0.2);
+    border-radius: 12px; padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .cal-num {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 48px; color: var(--acid);
+  }
+  .cal-label { color: var(--muted); font-size: 14px; }
+  .ingredients-title {
+    font-weight: 600; font-size: 13px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1rem;
+  }
+  .ingredient-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    animation: slideIn 0.3s ease forwards;
+    opacity: 0;
+  }
+  @keyframes slideIn { to { opacity: 1; transform: none; } from { opacity: 0; transform: translateX(-10px); } }
+  .ing-name { display: flex; align-items: center; gap: 8px; }
+  .ing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--acid); flex-shrink: 0; }
+  .ing-cals { color: var(--muted); font-size: 13px; }
+  .macro-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin: 1.5rem 0;
+  }
+  .macro-pill {
+    background: var(--mid);
+    border-radius: 12px; padding: 12px 10px;
+    text-align: center;
+  }
+  .macro-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 20px;
+  }
+  .macro-lbl { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+  .modal-add-btn {
+    width: 100%;
+    background: var(--acid);
+    color: var(--dark);
+    border: none; border-radius: 14px;
+    padding: 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 16px;
+    cursor: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin-top: 1.5rem;
+  }
+  .modal-add-btn:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(200,255,0,0.3); }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: var(--mid); border: 1px solid var(--border);
+    color: var(--text); width: 36px; height: 36px;
+    border-radius: 50%; font-size: 18px; cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { background: var(--hot); border-color: var(--hot); }
+
+  /* CART */
+  #cart-bar {
+    position: fixed; bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(20,20,20,0.95);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 20px;
+    z-index: 900;
+    backdrop-filter: blur(20px);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+    min-width: 280px;
+  }
+  #cart-bar.visible { transform: translateX(-50%) translateY(0); }
+  .cart-count {
+    background: var(--acid);
+    color: var(--dark);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .cart-items-preview {
+    flex: 1; font-size: 14px; color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .cart-total {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px; color: var(--acid);
+  }
+  .cart-pay-btn {
+    background: var(--acid);
+    color: var(--dark);
+    border: none; border-radius: 100px;
+    padding: 10px 22px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 15px;
+    cursor: none;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .cart-pay-btn:hover { transform: scale(1.05); }
+
+  /* CHECKOUT OVERLAY */
+  #checkout-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 2000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(12px);
+  }
+  #checkout-overlay.open { opacity: 1; pointer-events: all; }
+  .checkout-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    max-width: 500px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    transform: scale(0.9);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: 2rem;
+  }
+  #checkout-overlay.open .checkout-box { transform: scale(1); }
+  .checkout-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 40px; margin-bottom: 0.5rem;
+  }
+  .checkout-sub { color: var(--muted); font-size: 14px; margin-bottom: 2rem; }
+  .form-field { margin-bottom: 1.25rem; }
+  .form-label {
+    display: block; font-size: 12px;
+    font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .form-input, .form-textarea {
+    width: 100%;
+    background: var(--mid);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--acid); }
+  .form-textarea { resize: none; height: 90px; }
+  .order-summary {
+    background: var(--mid);
+    border-radius: 14px; padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .order-summary-title {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px;
+  }
+  .order-item-row {
+    display: flex; justify-content: space-between;
+    font-size: 14px; padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .order-item-row:last-child { border: none; }
+  .order-total-row {
+    display: flex; justify-content: space-between;
+    align-items: baseline;
+    padding-top: 12px; margin-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+  .total-label { font-weight: 600; }
+  .total-val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 28px; color: var(--acid);
+  }
+  .wa-btn {
+    width: 100%;
+    background: #25D366;
+    color: #fff;
+    border: none; border-radius: 14px;
+    padding: 18px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 16px;
+    cursor: none;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin-top: 1rem;
+  }
+  .wa-btn:hover { transform: scale(1.03); box-shadow: 0 0 30px rgba(37,211,102,0.4); }
+  .wa-icon { font-size: 22px; }
+  .req-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+
+  /* QR Section */
+  #qr-section {
+    padding: 4rem 2rem; text-align: center;
+    border-top: 1px solid var(--border);
+    background: var(--mid);
+  }
+  #qrcode { display: inline-block; padding: 16px; background: white; border-radius: 12px; margin: 1.5rem auto; }
+  .qr-hint { color: var(--muted); font-size: 14px; }
+
+  /* NOTIFICATIONS */
+  .notif {
+    position: fixed; top: 2rem; right: 2rem;
+    background: var(--acid);
+    color: var(--dark);
+    padding: 12px 20px; border-radius: 100px;
+    font-weight: 700; font-size: 14px;
+    z-index: 9000;
+    transform: translateY(-80px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .notif.show { transform: translateY(0); }
+
+  /* BACK BTN */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 100px; padding: 10px 20px;
+    color: var(--text); font-size: 14px; font-weight: 600;
+    cursor: none; transition: all 0.2s;
+    margin-bottom: 2rem;
+    text-decoration: none;
+  }
+  .back-btn:hover { border-color: var(--acid); color: var(--acid); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--dark); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .big-choice { grid-template-columns: 1fr; }
+    .menu-grid { grid-template-columns: 1fr; }
+    .macro-grid { grid-template-columns: repeat(3,1fr); }
+    #cart-bar { min-width: calc(100vw - 2rem); }
+  }
+
+  /* PAGE TRANSITIONS */
+  .page { display: none; }
+  .page.active { display: block; animation: pageFadeIn 0.6s ease forwards; }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+  /* QUANTITY CONTROLS IN CART PANEL */
+  .qty-ctrl {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .qty-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--mid); color: var(--text);
+    font-size: 16px; cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .qty-btn:hover { border-color: var(--acid); color: var(--acid); }
+  .qty-num { font-weight: 600; min-width: 20px; text-align: center; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="notif" id="notif"></div>
+
+<!-- ===== PAGE: HERO ===== -->
+<section id="hero" class="page active">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="hero-bg-text">BROTIEN</div>
+  <span class="hero-badge">Now Open · Hyderabad</span>
+  <h1 class="hero-title">
+    BROTIEN<br><span class="accent">CAFE</span>
+  </h1>
+  <p class="hero-sub">Fuel your gains. Feed your cravings. Zero compromise.</p>
+  <button class="cta-btn" onclick="showPage('order-type-page')">Order Now →</button>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    scroll
+  </div>
+</section>
+
+<!-- ===== PAGE: ORDER TYPE ===== -->
+<section id="order-type-page" class="page">
+  <div style="max-width:900px;margin:0 auto;padding:4rem 2rem;text-align:center;">
+    <div class="blob blob-1" style="opacity:0.06"></div>
+    <p class="section-label">Step 1 of 2</p>
+    <h2 class="section-title">HOW ARE YOU<br><span style="color:var(--acid)">EATING TODAY?</span></h2>
+    <div class="big-choice" id="orderTypeCards">
+      <div class="choice-card dine" id="card-dine" onclick="selectOrderType('dine')">
+        <span class="choice-icon">🪑</span>
+        <div class="choice-title">Dine In</div>
+        <div class="choice-desc">At the cafe — walk in, sit down, eat fresh</div>
+      </div>
+      <div class="choice-card delivery" id="card-delivery" onclick="selectOrderType('delivery')">
+        <span class="choice-icon">🛵</span>
+        <div class="choice-title">Online Delivery</div>
+        <div class="choice-desc">Order from home — we'll ride to you</div>
+      </div>
+    </div>
+    <p class="section-label" style="margin-bottom:0.5rem;margin-top:1rem;">Step 2 of 2 — What's your vibe?</p>
+    <div class="diet-toggle">
+      <button class="diet-btn" id="btn-all" onclick="selectDiet('all')">All Items</button>
+      <button class="diet-btn" id="btn-healthy" onclick="selectDiet('healthy')">🥗 Healthy</button>
+      <button class="diet-btn" id="btn-unhealthy" onclick="selectDiet('unhealthy')">🍔 Indulge</button>
+    </div>
+    <br>
+    <button class="cta-btn" onclick="goToMenu()">Browse Menu →</button>
+  </div>
+</section>
+
+<!-- ===== PAGE: MENU ===== -->
+<section id="menu-page" class="page">
+  <div id="menu-section">
+    <a class="back-btn" onclick="showPage('order-type-page')">← Change Options</a>
+    <div class="menu-header">
+      <div>
+        <p class="section-label">THE MENU</p>
+        <h2 class="menu-title">WHAT'LL<br>IT BE?</h2>
+      </div>
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+        <div class="menu-mode-tag">
+          <div class="mode-dot" id="modeDot"></div>
+          <span id="modeLabel">Dine In</span>
+        </div>
+        <div class="diet-toggle" style="margin:0">
+          <button class="diet-btn" id="mbtn-all" onclick="filterMenu('all')">All</button>
+          <button class="diet-btn" id="mbtn-healthy" onclick="filterMenu('healthy')">🥗 Healthy</button>
+          <button class="diet-btn" id="mbtn-unhealthy" onclick="filterMenu('unhealthy')">🍔 Indulge</button>
+        </div>
+      </div>
+    </div>
+    <div class="menu-grid" id="menuGrid"></div>
+  </div>
+</section>
+
+<!-- ===== DISH DETAIL MODAL ===== -->
+<div class="modal-overlay" id="dishModal" onclick="closeDishModal(event)">
+  <div class="modal-box" style="position:relative">
+    <button class="modal-close" onclick="closeDishModalBtn()">✕</button>
+    <div class="modal-emoji" id="modalEmoji"></div>
+    <div class="modal-content">
+      <h3 class="modal-name" id="modalName"></h3>
+      <p class="modal-desc" id="modalDesc"></p>
+      <div class="calories-big">
+        <span class="cal-num" id="modalCals"></span>
+        <span class="cal-label">kcal total</span>
+      </div>
+      <div class="macro-grid" id="modalMacros"></div>
+      <p class="ingredients-title">Ingredients & Nutrition</p>
+      <div id="modalIngredients"></div>
+      <button class="modal-add-btn" id="modalAddBtn">Add to Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CART BAR ===== -->
+<div id="cart-bar">
+  <div class="cart-count" id="cartCount">0</div>
+  <div class="cart-items-preview" id="cartPreview">items</div>
+  <div class="cart-total" id="cartTotal">₹0</div>
+  <button class="cart-pay-btn" onclick="openCheckout()">Pay →</button>
+</div>
+
+<!-- ===== CHECKOUT OVERLAY ===== -->
+<div id="checkout-overlay" onclick="closeCheckoutOuter(event)">
+  <div class="checkout-box">
+    <h3 class="checkout-title">ALMOST THERE!</h3>
+    <p class="checkout-sub">Fill in your details and we'll prep your order right away.</p>
+    <div class="form-field">
+      <label class="form-label">Your Name *</label>
+      <input class="form-input" id="userName" type="text" placeholder="e.g. Arjun Sharma">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Mobile Number *</label>
+      <input class="form-input" id="userPhone" type="tel" placeholder="e.g. 9876543210">
+    </div>
+    <div class="form-field" id="addressField" style="display:none">
+      <label class="form-label">Delivery Address *</label>
+      <textarea class="form-textarea" id="userAddress" placeholder="Enter your full delivery address..."></textarea>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Customizations / Notes</label>
+      <textarea class="form-textarea" id="userNotes" placeholder="e.g. Less spicy, no onions, extra sauce..."></textarea>
+    </div>
+    <div class="order-summary">
+      <p class="order-summary-title">Your Order</p>
+      <div id="checkoutItems"></div>
+      <div class="order-total-row">
+        <span class="total-label">Total</span>
+        <span class="total-val" id="checkoutTotal">₹0</span>
+      </div>
+    </div>
+    <button class="wa-btn" onclick="sendToWhatsApp()">
+      <span class="wa-icon">💬</span> Order via WhatsApp
+    </button>
+    <p class="req-note">* Required fields. You'll be redirected to WhatsApp with your full order pre-filled.</p>
+  </div>
+</div>
+
+<!-- ===== QR CODE SECTION ===== -->
+<section id="qr-section">
+  <p class="section-label">📱 Scan to Order</p>
+  <h3 style="font-family:'Bebas Neue',cursive;font-size:40px;margin-bottom:0.5rem;">QR FOR YOUR CAFE</h3>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:1rem;">Print this and paste it at your counter</p>
+  <div id="qrcode"></div>
+  <p class="qr-hint">Scans to → <span id="qrUrl" style="color:var(--acid)"></span></p>
+</section>
+
+<script>
+// =========== CONFIG — EDIT THESE ===========
+const WHATSAPP_NUMBER = "919133458116"; // YOUR WHATSAPP NUMBER with country code, no +
+const UPI_ID = "yourname@upi"; // Your UPI ID for payment
+const WEBSITE_URL = "https://yourusername.github.io/brotien-cafe"; // UPDATE after deploying
+// ===========================================
+
+// =========== MENU DATA ===========
+const MENU = [
+  // HEALTHY
+  { id:1, name:"Protein Power Bowl", emoji:"🥗", cat:"healthy", price:220, cals:420,
+    desc:"A nutrient-packed bowl with grilled chicken, quinoa, avocado, and superfoods.",
+    macros:{protein:"38g", carbs:"34g", fat:"12g"},
+    ingredients:[
+      {name:"Grilled Chicken Breast",cals:165},{name:"Quinoa",cals:120},{name:"Avocado",cals:60},
+      {name:"Cherry Tomatoes",cals:18},{name:"Spinach Leaves",cals:7},{name:"Olive Oil Drizzle",cals:40},
+      {name:"Lemon Dressing",cals:10}
+    ]
+  },
+  { id:2, name:"Green Machine Smoothie", emoji:"🥤", cat:"healthy", price:140, cals:210,
+    desc:"Banana, spinach, spirulina, almond milk, and whey protein. Goes hard on the macros.",
+    macros:{protein:"24g", carbs:"28g", fat:"3g"},
+    ingredients:[
+      {name:"Whey Protein",cals:100},{name:"Banana",cals:60},{name:"Baby Spinach",cals:10},
+      {name:"Almond Milk",cals:30},{name:"Spirulina",cals:10},{name:"Ice",cals:0}
+    ]
+  },
+  { id:3, name:"Egg White Omelette", emoji:"🍳", cat:"healthy", price:160, cals:240,
+    desc:"6 egg whites, mixed veggies, cottage cheese, zero oil. Gym bro approved.",
+    macros:{protein:"30g", carbs:"8g", fat:"6g"},
+    ingredients:[
+      {name:"6 Egg Whites",cals:102},{name:"Paneer Crumbles",cals:80},{name:"Bell Peppers",cals:20},
+      {name:"Mushrooms",cals:15},{name:"Onion",cals:10},{name:"Herbs & Spices",cals:5}
+    ]
+  },
+  { id:4, name:"Tuna Lettuce Wraps", emoji:"🌮", cat:"healthy", price:200, cals:310,
+    desc:"Tuna, greek yogurt dressing, cucumber, jalapeño, wrapped in crisp iceberg.",
+    macros:{protein:"28g", carbs:"12g", fat:"8g"},
+    ingredients:[
+      {name:"Canned Tuna",cals:130},{name:"Iceberg Lettuce",cals:15},{name:"Greek Yogurt Dressing",cals:60},
+      {name:"Cucumber",cals:16},{name:"Jalapeños",cals:4},{name:"Red Onion",cals:10},{name:"Capers",cals:5}
+    ]
+  },
+  { id:5, name:"Oats Protein Pancakes", emoji:"🥞", cat:"healthy", price:170, cals:350,
+    desc:"Banana oat pancakes with protein powder, drizzled with honey. No guilt.",
+    macros:{protein:"22g", carbs:"42g", fat:"7g"},
+    ingredients:[
+      {name:"Rolled Oats",cals:150},{name:"Banana",cals:60},{name:"Egg",cals:70},{name:"Whey Protein",cals:50},
+      {name:"Honey Drizzle",cals:20}
+    ]
+  },
+  { id:6, name:"Acai Energy Bowl", emoji:"🍇", cat:"healthy", price:190, cals:380,
+    desc:"Frozen acai, mixed berries, granola, coconut flakes, chia seeds. Beautiful and brutal.",
+    macros:{protein:"12g", carbs:"55g", fat:"9g"},
+    ingredients:[
+      {name:"Acai Blend",cals:160},{name:"Mixed Berries",cals:60},{name:"Granola",cals:80},
+      {name:"Coconut Flakes",cals:45},{name:"Chia Seeds",cals:35}
+    ]
+  },
+  // UNHEALTHY
+  { id:7, name:"Loaded Smash Burger", emoji:"🍔", cat:"unhealthy", price:280, cals:740,
+    desc:"Double smash patty, cheddar, caramelized onions, secret sauce, brioche bun. RIP diet.",
+    macros:{protein:"38g", carbs:"52g", fat:"32g"},
+    ingredients:[
+      {name:"Double Beef Patty",cals:400},{name:"Cheddar Cheese x2",cals:120},{name:"Brioche Bun",cals:140},
+      {name:"Caramelized Onions",cals:40},{name:"Secret Sauce",cals:80},{name:"Pickles & Mustard",cals:10}
+    ]
+  },
+  { id:8, name:"Masala Cheese Fries", emoji:"🍟", cat:"unhealthy", price:150, cals:520,
+    desc:"Crispy fries, masala dust, melted cheese sauce, sev, green chutney on top.",
+    macros:{protein:"10g", carbs:"62g", fat:"26g"},
+    ingredients:[
+      {name:"Deep Fried Potato Fries",cals:310},{name:"Cheese Sauce",cals:100},{name:"Masala Dust",cals:20},
+      {name:"Sev",cals:60},{name:"Green Chutney",cals:15},{name:"Spring Onion",cals:5}
+    ]
+  },
+  { id:9, name:"Nutella Protein Shake", emoji:"🍫", cat:"unhealthy", price:180, cals:610,
+    desc:"Nutella, whole milk, banana, ice cream scoop, sprinkles. Technically has protein.",
+    macros:{protein:"14g", carbs:"82g", fat:"22g"},
+    ingredients:[
+      {name:"Nutella 3 tbsp",cals:300},{name:"Whole Milk",cals:150},{name:"Banana",cals:60},
+      {name:"Vanilla Ice Cream",cals:80},{name:"Sprinkles",cals:20}
+    ]
+  },
+  { id:10, name:"Spicy Fried Chicken Wrap", emoji:"🌯", cat:"unhealthy", price:240, cals:680,
+    desc:"Nashville-style hot fried chicken, coleslaw, cheese, mayo, flour tortilla. Dangerous.",
+    macros:{protein:"30g", carbs:"58g", fat:"28g"},
+    ingredients:[
+      {name:"Fried Chicken Thigh",cals:350},{name:"Nashville Hot Sauce",cals:40},{name:"Flour Tortilla",cals:120},
+      {name:"Coleslaw",cals:80},{name:"Cheese Slice",cals:60},{name:"Mayo",cals:30}
+    ]
+  },
+  { id:11, name:"Maggi Bomb", emoji:"🍜", cat:"unhealthy", price:130, cals:490,
+    desc:"Maggi noodles, butter, egg, chili flakes, cheese, spring onion. Chaotic good.",
+    macros:{protein:"16g", carbs:"60g", fat:"20g"},
+    ingredients:[
+      {name:"Maggi Noodles",cals:300},{name:"Butter 1tbsp",cals:100},{name:"Egg",cals:70},
+      {name:"Cheese",cals:50},{name:"Chili Flakes & Masala",cals:20},{name:"Spring Onion",cals:5}
+    ]
+  },
+  { id:12, name:"Brownie Overload Sundae", emoji:"🍨", cat:"unhealthy", price:220, cals:780,
+    desc:"Warm brownie, 3 scoops ice cream, hot fudge, whipped cream, wafer, cherry.",
+    macros:{protein:"9g", carbs:"102g", fat:"34g"},
+    ingredients:[
+      {name:"Chocolate Brownie",cals:350},{name:"3 Ice Cream Scoops",cals:240},{name:"Hot Fudge",cals:100},
+      {name:"Whipped Cream",cals:50},{name:"Wafer Roll",cals:30},{name:"Cherry",cals:10}
+    ]
+  }
+];
+
+// =========== STATE ===========
+let state = { orderType: 'dine', diet: 'all', cart: {}, activeMenuFilter: 'all' };
+let currentDishId = null;
+
+// =========== CURSOR ===========
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function animCursor(){
+  rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15;
+  cursor.style.left = mx - 6 + 'px'; cursor.style.top = my - 6 + 'px';
+  ring.style.left = rx - 18 + 'px'; ring.style.top = ry - 18 + 'px';
+  requestAnimationFrame(animCursor);
+})();
+
+// =========== PAGES ===========
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// =========== ORDER TYPE ===========
+function selectOrderType(type) {
+  state.orderType = type;
+  document.getElementById('card-dine').classList.toggle('selected', type === 'dine');
+  document.getElementById('card-delivery').classList.toggle('selected', type === 'delivery');
+  if(type==='delivery') {
+    document.getElementById('addressField').style.display = 'block';
+  } else {
+    document.getElementById('addressField').style.display = 'none';
+  }
+}
+function selectDiet(diet) {
+  state.diet = diet;
+  ['all','healthy','unhealthy'].forEach(d => {
+    const btn = document.getElementById('btn-' + d);
+    btn.classList.remove('active-healthy','active-unhealthy');
+    if(d === diet) {
+      if(diet === 'healthy') btn.classList.add('active-healthy');
+      else if(diet === 'unhealthy') btn.classList.add('active-unhealthy');
+      else { btn.style.background='var(--acid)'; btn.style.color='var(--dark)'; }
+    } else { btn.style.background=''; btn.style.color=''; }
+  });
+}
+function goToMenu() {
+  state.activeMenuFilter = state.diet;
+  showPage('menu-page');
+  renderMenu();
+  updateModeLabel();
+}
+
+// =========== MENU RENDER ===========
+function filterMenu(diet) {
+  state.activeMenuFilter = diet;
+  ['all','healthy','unhealthy'].forEach(d => {
+    const btn = document.getElementById('mbtn-'+d);
+    btn.classList.remove('active-healthy','active-unhealthy');
+    if(d===diet){
+      if(diet==='healthy') btn.classList.add('active-healthy');
+      else if(diet==='unhealthy') btn.classList.add('active-unhealthy');
+      else { btn.style.background='var(--acid)'; btn.style.color='var(--dark)'; }
+    } else { btn.style.background=''; btn.style.color=''; }
+  });
+  renderMenu();
+}
+function renderMenu() {
+  const f = state.activeMenuFilter;
+  const filtered = f === 'all' ? MENU : MENU.filter(d => d.cat === f);
+  const grid = document.getElementById('menuGrid');
+  grid.innerHTML = filtered.map(dish => `
+    <div class="dish-card" onclick="openDishModal(${dish.id})" style="animation-delay:${MENU.indexOf(dish)*0.05}s">
+      <span class="dish-tag ${dish.cat==='healthy'?'tag-healthy':'tag-unhealthy'}">${dish.cat==='healthy'?'Healthy':'Indulge'}</span>
+      <div class="dish-emoji-wrap">${dish.emoji}</div>
+      <div class="dish-body">
+        <div class="dish-name">${dish.name}</div>
+        <div class="dish-desc">${dish.desc}</div>
+        <div class="dish-footer">
+          <div class="dish-price"><span class="price-cur">₹</span>${dish.price}</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="tag-cal">${dish.cals} kcal</span>
+            <button class="add-btn" onclick="addToCart(${dish.id}, event)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function updateModeLabel() {
+  const dot = document.getElementById('modeDot');
+  const lbl = document.getElementById('modeLabel');
+  if(state.orderType === 'dine') {
+    dot.style.background = 'var(--acid)'; lbl.textContent = 'Dine In';
+  } else {
+    dot.style.background = 'var(--cool)'; lbl.textContent = 'Delivery';
+  }
+}
+// Set default selections on load
+selectOrderType('dine');
+selectDiet('all');
+filterMenu('all');
+
+// =========== DISH MODAL ===========
+function openDishModal(id) {
+  const dish = MENU.find(d => d.id === id);
+  if(!dish) return;
+  currentDishId = id;
+  document.getElementById('modalEmoji').textContent = dish.emoji;
+  document.getElementById('modalName').textContent = dish.name;
+  document.getElementById('modalDesc').textContent = dish.desc;
+  document.getElementById('modalCals').textContent = dish.cals;
+  document.getElementById('modalMacros').innerHTML = Object.entries(dish.macros).map(([k,v]) => `
+    <div class="macro-pill">
+      <div class="macro-val">${v}</div>
+      <div class="macro-lbl">${k}</div>
+    </div>`).join('');
+  document.getElementById('modalIngredients').innerHTML = dish.ingredients.map((ing,i) => `
+    <div class="ingredient-row" style="animation-delay:${i*0.04}s">
+      <span class="ing-name"><span class="ing-dot"></span>${ing.name}</span>
+      <span class="ing-cals">${ing.cals} kcal</span>
+    </div>`).join('');
+  document.getElementById('modalAddBtn').textContent = `Add to Order — ₹${dish.price}`;
+  document.getElementById('modalAddBtn').onclick = () => { addToCart(id); closeDishModalBtn(); };
+  document.getElementById('dishModal').classList.add('open');
+}
+function closeDishModal(e) {
+  if(e.target === document.getElementById('dishModal')) closeDishModalBtn();
+}
+function closeDishModalBtn() {
+  document.getElementById('dishModal').classList.remove('open');
+}
+
+// =========== CART ===========
+function addToCart(id, event) {
+  if(event) event.stopPropagation();
+  const dish = MENU.find(d => d.id === id);
+  if(!dish) return;
+  state.cart[id] = (state.cart[id] || 0) + 1;
+  updateCartUI();
+  showNotif(`${dish.emoji} ${dish.name} added!`);
+}
+function updateCartUI() {
+  const ids = Object.keys(state.cart).filter(k => state.cart[k] > 0);
+  const total = ids.reduce((s,k) => {
+    const d = MENU.find(x => x.id == k); return s + (d ? d.price * state.cart[k] : 0);
+  }, 0);
+  const count = ids.reduce((s,k) => s + state.cart[k], 0);
+  document.getElementById('cartCount').textContent = count;
+  document.getElementById('cartTotal').textContent = '₹' + total;
+  const names = ids.map(k => { const d=MENU.find(x=>x.id==k); return d?`${d.name} x${state.cart[k]}`:''; }).join(', ');
+  document.getElementById('cartPreview').textContent = names || 'Your cart';
+  const bar = document.getElementById('cart-bar');
+  if(count > 0) bar.classList.add('visible'); else bar.classList.remove('visible');
+}
+
+// =========== NOTIFICATIONS ===========
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2200);
+}
+
+// =========== CHECKOUT ===========
+function openCheckout() {
+  const ids = Object.keys(state.cart).filter(k => state.cart[k] > 0);
+  if(ids.length === 0) return showNotif('Cart is empty!');
+  const total = ids.reduce((s,k) => {
+    const d = MENU.find(x => x.id == k); return s + (d ? d.price * state.cart[k] : 0);
+  }, 0);
+  document.getElementById('checkoutItems').innerHTML = ids.map(k => {
+    const d = MENU.find(x => x.id == k);
+    return `<div class="order-item-row">
+      <span>${d.emoji} ${d.name} × ${state.cart[k]}</span>
+      <span>₹${d.price * state.cart[k]}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('checkoutTotal').textContent = '₹' + total;
+  if(state.orderType === 'delivery') {
+    document.getElementById('addressField').style.display = 'block';
+  } else {
+    document.getElementById('addressField').style.display = 'none';
+  }
+  document.getElementById('checkout-overlay').classList.add('open');
+}
+function closeCheckoutOuter(e) {
+  if(e.target === document.getElementById('checkout-overlay'))
+    document.getElementById('checkout-overlay').classList.remove('open');
+}
+
+// =========== ORDER ID GENERATOR ===========
+function generateOrderId() {
+  const now = new Date();
+  const d = now.toISOString().slice(0,10).replace(/-/g,'');
+  const t = String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0') + String(now.getSeconds()).padStart(2,'0');
+  return `BRC-${d}-${t}`;
+}
+
+// =========== WHATSAPP SEND + GOOGLE SHEETS ===========
+async function sendToWhatsApp() {
+  const name = document.getElementById('userName').value.trim();
+  const phone = document.getElementById('userPhone').value.trim();
+  const address = document.getElementById('userAddress').value.trim();
+  const notes = document.getElementById('userNotes').value.trim();
+
+  if(!name) { showNotif('⚠️ Please enter your name'); return; }
+  if(!phone || phone.length < 10) { showNotif('⚠️ Enter a valid mobile number'); return; }
+  if(state.orderType === 'delivery' && !address) { showNotif('⚠️ Delivery address required'); return; }
+
+  const ids = Object.keys(state.cart).filter(k => state.cart[k] > 0);
+  const total = ids.reduce((s,k) => {
+    const d = MENU.find(x => x.id == k); return s + (d ? d.price * state.cart[k] : 0);
+  }, 0);
+  const orderId = generateOrderId();
+
+  // Build WhatsApp message
+  const orderLines = ids.map(k => {
+    const d = MENU.find(x => x.id == k);
+    return `  • ${d.emoji} ${d.name} × ${state.cart[k]} = ₹${d.price * state.cart[k]}`;
+  }).join('\n');
+
+  let msg = `🟡 *BROTIEN CAFE — NEW ORDER*\n`;
+  msg += `━━━━━━━━━━━━━━━━━\n`;
+  msg += `🔖 Order ID: *${orderId}*\n`;
+  msg += `👤 Name: *${name}*\n`;
+  msg += `📱 Phone: *${phone}*\n`;
+  msg += `🛵 Type: *${state.orderType === 'dine' ? 'Dine In' : 'Online Delivery'}*\n`;
+  if(state.orderType === 'delivery') msg += `📍 Address: ${address}\n`;
+  msg += `━━━━━━━━━━━━━━━━━\n`;
+  msg += `*ORDER ITEMS:*\n${orderLines}\n`;
+  msg += `━━━━━━━━━━━━━━━━━\n`;
+  msg += `💰 *TOTAL: ₹${total}*\n\n`;
+  msg += `💳 *Payment:* Please pay ₹${total} to UPI ID: *${UPI_ID}*\n`;
+  msg += `📸 Share payment screenshot after paying\n`;
+  if(state.orderType === 'delivery') msg += `📌 Also share your live location for delivery\n`;
+  if(notes) msg += `\n📝 *Notes:* ${notes}\n`;
+  msg += `\nThank you for ordering from Brotien Cafe! 💪`;
+
+  // Send to Google Sheets (Apps Script Web App URL)
+  const APPS_SCRIPT_URL = ""; // PASTE YOUR APPS SCRIPT URL HERE
+  const orderData = {
+    orderId, name, phone, address, notes,
+    orderType: state.orderType,
+    items: ids.map(k => { const d=MENU.find(x=>x.id==k); return `${d.name} x${state.cart[k]}`; }).join('; '),
+    total, timestamp: new Date().toISOString()
+  };
+  if(APPS_SCRIPT_URL) {
+    fetch(APPS_SCRIPT_URL, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(orderData)
+    }).catch(()=>{});
+  }
+
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(waUrl, '_blank');
+  document.getElementById('checkout-overlay').classList.remove('open');
+  state.cart = {};
+  updateCartUI();
+  showNotif('✅ Order sent to WhatsApp!');
+}
+
+// =========== QR CODE ===========
+window.addEventListener('load', () => {
+  const url = WEBSITE_URL;
+  document.getElementById('qrUrl').textContent = url;
+  new QRCode(document.getElementById('qrcode'), {
+    text: url, width: 180, height: 180,
+    colorDark: "#000000", colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+});
+</script>
+</body>
+</html>
